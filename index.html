@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer Game</title>
+    <style>
+canvas#myCanvas {
+  background-color: lightGreen;
+  border: 3px solid gray;
+}
+    </style>
+</head>
+<body>
+    <p1> Use the Arrow Keys to Move!</p1>
+<canvas id="myCanvas" width="1025" height="550">Your browser does not support JS Canvas</canvas>
+<button onclick="playGame()">Start</button>
+    <script>
+const canvas = document.getElementById("myCanvas");
+let ctx = canvas.getContext("2d");
+
+const CW = canvas.width;
+const CH = canvas.height;
+const halfCW = CW / 2;
+const halfCH = CH / 2;
+
+let ballIconSrc = "https://cdn-icons-png.flaticon.com/512/53/53283.png";
+let ballImage = new Image();
+ballImage.crossOrigin = "anonymous";
+ballImage.src = ballIconSrc;
+
+let ballX = halfCW;
+let ballY = halfCH;
+let ballW = 30;
+let ballH = 30;
+let bounces = 0;
+let falls = 0;
+
+function drawRect(x, y, w, h) {
+  ctx.fillRect(x, y, w, h);
+}
+function drawBall() {
+  drawRect(ballX, ballY, ballW, ballH);
+}
+drawBall();
+
+let paddleW = 100;
+let paddleH = 20;
+let paddleX = halfCW - paddleW / 2;
+let paddleY = CH - paddleH;
+
+function drawPaddle() {
+  drawRect(paddleX, paddleY, paddleW, paddleH);
+}
+drawPaddle();
+
+// let netX = CW / 2 - 65;
+// let netY = CW / 2 - 500;
+// let netW = 120;
+// let netH = 30;
+// function drawNet() {
+//   drawRect(netX, netY, netW, netH);
+// }
+// drawNet();
+
+function drawHUD() {
+  ctx.font = "12px Arial";
+  ctx.fillText("Bounces: " + bounces + "    Falls: " + falls, 50, 50);
+
+  //(string, x, y)
+}
+drawHUD();
+
+let ballSpeedX = 5;
+let ballSpeedY = 5;
+
+function paddleCollision() {
+  if (
+    //left
+    ballX < paddleX + paddleW &&
+    //right
+    ballX + ballW > paddleX &&
+    //top
+    ballY < paddleY + paddleH &&
+    //bottom
+    ballY + ballH > paddleY
+  ) {
+    return true;
+  }
+}
+
+//event listener, controls
+let moveRight = false;
+let moveLeft = false;
+let moveUp = false;
+let moveDown = false;
+document.addEventListener("keydown", function (event) {
+  if (event.key === "ArrowRight") {
+    moveRight = true;
+  }
+  if (event.key === "ArrowLeft") {
+    moveLeft = true;
+  }
+  if (event.key === "ArrowUp") {
+    moveUp = true;
+  }
+  if (event.key === "ArrowDown") {
+    moveDown = true;
+  }
+});
+//event listener, controls
+document.addEventListener("keyup", function (event) {
+  if (event.key === "ArrowRight") {
+    moveRight = false;
+  }
+  if (event.key === "ArrowLeft") {
+    moveLeft = false;
+  }
+  if (event.key === "ArrowUp") {
+    moveUp = false;
+  }
+  if (event.key === "ArrowDown") {
+    moveDown = false;
+  }
+});
+
+function playGame() {
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+  ctx.clearRect(0, 0, CW, CH);
+  if (ballX + ballW > CW || ballX < 0) {
+    ballSpeedX *= -1;
+  }
+  //collision
+
+  if (paddleCollision()) {
+    ballSpeedX *= 1;
+    ballSpeedY *= -1;
+    bounces++;
+    console.log("bounces:" + bounces);
+  } else if (ballY + ballH > CH) {
+    ballSpeedY *= -1;
+    falls++;
+    console.log("falls:" + falls);
+  }
+  if (ballY < 0) {
+    ballSpeedY *= -1;
+  }
+
+  //movement
+  if (moveRight && paddleX + paddleW < CW) {
+    paddleX += 10;
+  }
+  if (moveLeft && paddleX > 0) {
+    paddleX -= 10;
+  }
+  if (moveUp && paddleY > 0) {
+    paddleY -= 10;
+  }
+  if (moveDown && paddleY + paddleH < CH) {
+    paddleY += 10;
+  }
+  //keeping objects
+  drawPaddle();
+  drawBall();
+  drawHUD();
+  //drawNet();
+  requestAnimationFrame(playGame);
+}
+//playGame();
+    </script>
+</body>
+</html>
